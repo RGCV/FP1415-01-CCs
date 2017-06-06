@@ -62,15 +62,15 @@ CC_INFO = (
 # the given digit. For example: Initial digit = 1 => index = 0
 
 CC_CATEGORIES = (
-    'Companhias aereas',
-    'Companhias aereas e outras atribuicoes futuras da industria',
-    'Viagens e entretenimento e bancario / financeiro',
-    'Servicos bancarios e financeiros',
-    'Servicos bancarios e financeiros',
-    'Merchandising e bancario / financeiro',
-    'Petroleo e outras atribuicoes futuras da industria',
-    'Saude, telecomunicacoes e outras atribuicoes futuras da industria',
-    'Atribuicao nacional'
+    'Airlines',
+    'Airlines, financial and other future industry assignments',
+    'Travel and entertainment',
+    'Banking and financial',
+    'Banking and financial',
+    'Merchandising and banking / financial',
+    'Petroleum and other future industry assignments',
+    'Healthcare, telecommunications and other future industry assignments',
+    'National attribution'
     )
 
 # Indexes for different rows in CC_INFO
@@ -86,7 +86,7 @@ IDX_LENGTH       = 3
 ## Helper functions
 ##
 
-def calc_soma(cc_str):
+def compute_sum(cc_str):
     """ Executes instructions 2 through 4 (w/o verification digit) of Luhn's
         Algorithm on cc_str
     Params: (string) 'CC Number (w/o verification)' cc_str
@@ -108,16 +108,16 @@ def calc_soma(cc_str):
         cc_sum = cc_sum + digit
     return cc_sum
 
-def luhn_verifica(cc_str):
+def luhn_verify(cc_str):
     """ Applies Luhn's algorithm to verify the given cc number
     Params: (string) 'CC Number' cc_str
     Return: (bool) True, if number is valid, False otherwise"""
     
     check_digit = eval(cc_str) % 10
     cc_str_wo_digit = eval(cc_str) // 10
-    return (calc_soma(str(cc_str_wo_digit)) + check_digit) % 10 == 0
+    return (compute_sum(str(cc_str_wo_digit)) + check_digit) % 10 == 0
 
-def comeca_por(str1, str2):
+def starts_with(str1, str2):
     """ Checks if str1 starts with str2
     Params: (string) 'Candidate string' str1
             (string) 'Potential prefix' str2
@@ -130,7 +130,7 @@ def comeca_por(str1, str2):
     # application)
     return str(eval(str1) // (10 ** diff)) == str2
 
-def comeca_por_um(str, strs):
+def starts_with_one(str, strs):
     """ Checks if str starts with any of the strings in strs
     Params: (string) 'Candidate string' str
             (tuple) 'Tuple of potential prefixes' strs
@@ -138,7 +138,7 @@ def comeca_por_um(str, strs):
         False otherwise"""
     
     for s in strs:
-        if comeca_por(str, s):
+        if starts_with(str, s):
             return True
     return False
 
@@ -156,8 +156,8 @@ def valida_iin(cc_str):
     for cc_issuer in CC_INFO:
         # Checks the, if so, multiple prefixes
         for iin in cc_issuer[IDX_IIN_DIGITS]:
-            if (not isinstance(iin, str) and comeca_por_um(cc_str, iin)) \
-                or comeca_por(cc_str, iin):
+            if (not isinstance(iin, str) and starts_with_one(cc_str, iin)) \
+                or starts_with(cc_str, iin):
                 valid_iin = True
                 # Do the same for possible lengths
                 for length in cc_issuer[IDX_LENGTH]:
@@ -167,7 +167,7 @@ def valida_iin(cc_str):
                 return cc_issuer[IDX_ISSUER]
     return ''
 
-def categoria(cc_str):
+def category(cc_str):
     """ Returns the category of the credit card number cc_str
     Params: (string) 'CC Number' cc_str
     Return: (string) 'CC Category'"""
@@ -175,16 +175,16 @@ def categoria(cc_str):
     # Obtains the most significant digit dividing the number by 10^(length - 1)
     return CC_CATEGORIES[eval(cc_str) // 10 ** (len(cc_str) - 1) - 1]
 
-def digito_verificacao(cc_str):
+def check_digit(cc_str):
     """ Calculates the verification digit for the given credit card number
     Params: (string) 'CC Number' cc_str
     Return: (string) 'Verification digit'"""
     
     # Complements the sum with the digit that will make the resulting sum a
     # multiple of 10
-    verification_digit = (10 - (calc_soma(cc_str) % 10))
-    if verification_digit != 10:
-        return str(verification_digit % 10)
+    check_digit = (10 - (compute_sum(cc_str) % 10))
+    if check_digit != 10:
+        return str(check_digit % 10)
     return '0'
 
 
@@ -195,18 +195,18 @@ def digito_verificacao(cc_str):
 
 from random import random
 
-def verifica_cc(cc_num):
+def check_cc(cc_num):
     """ Checks if cc_num is a valid credit card number
     Params: (int) 'CC Number' cc_num
     Return: (tuple) 'Category and Issuer', if valid,
             (string) 'Invalido' otherwise"""
     
     cc_str = str(cc_num)
-    if luhn_verifica(cc_str) and valida_iin(cc_str) != '':
-        return (categoria(cc_str), valida_iin(cc_str))
+    if luhn_verify(cc_str) and valida_iin(cc_str) != '':
+        return (category(cc_str), valida_iin(cc_str))
     return 'cartao invalido'
 
-def gera_num_cc(issuer_abbrev):
+def generate_cc_num(issuer_abbrev):
     """ Generates a random credit card number based on the given abbreviation
     Params: (string) 'Issuer abbreviation' issuer_abbrev
     Return: (int) 'CC Number'"""
@@ -236,4 +236,4 @@ def gera_num_cc(issuer_abbrev):
     for n in range(cc_len):
         cc_num = cc_num + str(int(10 * random()))
     
-    return int(cc_num + digito_verificacao(cc_num))
+    return int(cc_num + check_digit(cc_num))
