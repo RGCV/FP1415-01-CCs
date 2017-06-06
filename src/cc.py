@@ -1,19 +1,19 @@
 # 81045 - Rui Ventura
 
 ##
-## Definicao de constantes
+## Constants
 ##
 
-# Informacao sobre os cartoes de credito compilada em tuplos (estilo tabela, o
-# indice mais externo corresponde a uma linha, o seguinte a uma coluna. Certas
-# colunas tem mais "linhas", embora sejam da mesma categoria, havendo entao uma
-# terceira seccao no interior da coluna)
-T_INFO_CARTOES = (
-    ## Exemplo generico
-    #('Abreviatura',
-    # 'Rede Emissora',
-    # ('prefixo-1','prefixo-2',...,'prefixo-n'),
-    # (comp-1, comp-2,...,comp-n)),
+# Information about credit cards, compiled into tuples (in a table-like fashion,
+# or 2-D array, where the first is the row's index and the second the column's.
+# Certain rows may have more elements, even if of the same "category").
+
+CC_INFO = (
+    ## Generic example
+    #('Abbreviation',
+    # 'Issuer',
+    # ('prefix-1','prefix-2', ..., 'prefix-n'),
+    # (length-1, length-2, ..., length-n)),
     
     ## American Express
     ('AE',
@@ -58,9 +58,10 @@ T_INFO_CARTOES = (
      (13, 16))
 )
 
-# Dependendo do digito inicial, este menos 1 sera o indice para cada uma das
-# categorias. Por ex.: Digito inicial = 1 => indice = 0
-T_CATEGORIAS = (
+# The category's index depends on the card's initial digit, as it is one less
+# the given digit. For example: Initial digit = 1 => index = 0
+
+CC_CATEGORIES = (
     'Companhias aereas',
     'Companhias aereas e outras atribuicoes futuras da industria',
     'Viagens e entretenimento e bancario / financeiro',
@@ -72,145 +73,167 @@ T_CATEGORIAS = (
     'Atribuicao nacional'
     )
 
-# Indices dos diferentes tipos de informacao
-INT_ABREVIATURA   = 0
-INT_REDE_EMISSORA = 1
-INT_DIGITOS_IIN   = 2
-INT_COMPRIMENTO   = 3
+# Indexes for different rows in CC_INFO
+
+IDX_ABBREVIATION = 0
+IDX_ISSUER       = 1
+IDX_IIN_DIGITS   = 2
+IDX_LENGTH       = 3
+
+
 
 ##
-## Funcoes auxiliares
+## Helper functions
 ##
 
-def calc_soma(str_cad):
-    """ Executa as instrucoes 2 - 4 (sem digito de verificacao) do Algoritmo de Luhn sobre str_cad
-    Recebe: (String) 'Numero de CC (sem verificacao)' str_cad
-    Devolve: (Int) 'Soma do Numero Processado' int_soma"""
-    str_num_cc_inverso = ''
+def calc_soma(cc_str):
+    """ Executes instructions 2 through 4 (w/o verification digit) of Luhn's
+        Algorithm on cc_str
+    Params: (string) 'CC Number (w/o verification)' cc_str
+    Return: (int) 'Processed number's sum' cc_sum """
     
-    for char_digito in str_cad:
-        str_num_cc_inverso = char_digito + str_num_cc_inverso
+    cc_str_inverse = ''
     
-    int_soma = 0
-    for i in range(len(str_num_cc_inverso)):
-        int_num = eval(str_num_cc_inverso[i])
+    for c in cc_str:
+        cc_str_inverse = c + cc_str_inverse
+    
+    cc_sum = 0
+    for i in range(len(cc_str_inverse)):
+        digit = eval(cc_str_inverse[i])
         
         if i % 2 == 0:
-            int_num = int_num * 2
-            if int_num > 9:
-                int_num = int_num - 9
-        int_soma = int_soma + int_num
-    return int_soma
+            digit = digit * 2
+            if digit > 9:
+                digit = digit - 9
+        cc_sum = cc_sum + digit
+    return cc_sum
 
-def luhn_verifica(str_cad):
-    """ Verifica se o numero passa o algoritmo de Luhn
-    Recebe: (String) 'Numero de CC' str_cad
-    Devolve: (Bool) """
-    str_num_ver = eval(str_cad) % 10
-    str_num_cc_sem_ver = eval(str_cad) // 10
-    return (calc_soma(str(str_num_cc_sem_ver)) + str_num_ver) % 10 == 0
-
-def comeca_por(str_cad1, str_cad2):
-    """ Verificar se str_cad1 se inicia por str_cad2
-    Recebe: (String) 'Numero de CC' str_cad1;
-            (String) 'Digitos Iniciais' str_cad2
-    Devolve: (Bool)"""
-    int_diferenca = len(str_cad1) - len(str_cad2)
+def luhn_verifica(cc_str):
+    """ Applies Luhn's algorithm to verify the given cc number
+    Params: (string) 'CC Number' cc_str
+    Return: (bool) True, if number is valid, False otherwise"""
     
-    # Ao dividir por 10 ** diferenca entre comprimentos, vai reduzir a cadeia a
-    # comparar ao comprimento da cadeia a qual esta a ser comparada
-    return str(eval(str_cad1) // (10 ** int_diferenca)) == str_cad2
+    check_digit = eval(cc_str) % 10
+    cc_str_wo_digit = eval(cc_str) // 10
+    return (calc_soma(str(cc_str_wo_digit)) + check_digit) % 10 == 0
 
-def comeca_por_um(str_cad, t_cads):
-    """ Verificar se str_cad se inicia por alguma das cadeias em t_cads
-    Recebe: (String) 'Numero de CC' str_cad
-    Devolve: (Bool) """
-    for c in t_cads:
-        if comeca_por(str_cad, c):
+def comeca_por(str1, str2):
+    """ Checks if str1 starts with str2
+    Params: (string) 'Candidate string' str1
+            (string) 'Potential prefix' str2
+    Return: (bool) True, if str2 is a prefix of str2, False otherwise"""
+    
+    diff = len(str1) - len(str2)
+    
+    # By dividing the evaluated number by 10^diff, it'll reduce str1 to the
+    # size of str2 (assuming str1 and str2 are integers, which is True, for this
+    # application)
+    return str(eval(str1) // (10 ** diff)) == str2
+
+def comeca_por_um(str, strs):
+    """ Checks if str starts with any of the strings in strs
+    Params: (string) 'Candidate string' str
+            (tuple) 'Tuple of potential prefixes' strs
+    Return: (bool) True, if any of the strings in 'strs' is a prefix of str1,
+        False otherwise"""
+    
+    for s in strs:
+        if comeca_por(str, s):
             return True
     return False
 
-def valida_iin(str_cad):
-    """ Verifica o numero correspondente a str_cad, validando os digitos iin e o seu comprimento
-    Recebe: (String) 'Numero de CC' str_cad
-    Devolve: (String) 'Rede Emissora' """
-    int_len_cad = len(str_cad)
-    bool_digitos_iin, bool_comp_cad = False, False
+def valida_iin(cc_str):
+    """ Checks the number corresponding to the given string, validating the IIN
+        digits and its length
+    Params: (string) 'CC Number' cc_str
+    Return: (string) 'Issuer'"""
     
-    # Procura pelo tuplo com a informacao sobre a rede emissora correspondente aos digitos iin
-    for t_info_cc in T_INFO_CARTOES:
-        # Verifica os, se tal, varios prefixos. 
-        for iin in t_info_cc[INT_DIGITOS_IIN]:
-            if (not isinstance(iin, str) and comeca_por_um(str_cad, iin)) \
-                or comeca_por(str_cad, iin):
-                bool_digitos_iin = True
-                # Semelhante aos prefixos, agora com o comprimento
-                for comp in t_info_cc[INT_COMPRIMENTO]:
-                    if int_len_cad == comp:
-                        bool_comp_cad = True
-            if bool_digitos_iin and bool_comp_cad:
-                return t_info_cc[INT_REDE_EMISSORA]
+    cc_len = len(cc_str)
+    valid_iin, same_length = False, False
+    
+    # Look for the tuple with the details of the corresponding issuer given the
+    # iin digits
+    for cc_issuer in CC_INFO:
+        # Checks the, if so, multiple prefixes
+        for iin in cc_issuer[IDX_IIN_DIGITS]:
+            if (not isinstance(iin, str) and comeca_por_um(cc_str, iin)) \
+                or comeca_por(cc_str, iin):
+                valid_iin = True
+                # Do the same for possible lengths
+                for length in cc_issuer[IDX_LENGTH]:
+                    if cc_len == length:
+                        same_length = True
+            if valid_iin and same_length:
+                return cc_issuer[IDX_ISSUER]
     return ''
 
-def categoria(str_cad):
-    """ Devolve a categoria do cartao com o numero correspondente a str_cad
-    Recebe: (String) 'Numero de CC' str_cad
-    Devolve: (String) 'Categoria do CC' """
-    # Obtém o digito mais significativo dividindo (div. inteira) o inteiro por
-    # 10 elevado ao comprimento da cadeia menos 1
-    return T_CATEGORIAS[eval(str_cad) // 10 ** (len(str_cad) - 1) - 1]
+def categoria(cc_str):
+    """ Returns the category of the credit card number cc_str
+    Params: (string) 'CC Number' cc_str
+    Return: (string) 'CC Category'"""
+    
+    # Obtains the most significant digit dividing the number by 10^(length - 1)
+    return CC_CATEGORIES[eval(cc_str) // 10 ** (len(cc_str) - 1) - 1]
 
-def digito_verificacao(str_cad):
-    """ Calcula o digito de verificacao do numero do cartao
-    Recebe: (String) 'Numero de CC' str_cad
-    Devolve: (String) 'Digito de Verificacao' """
-    # Complementa a soma com o digito que tornara a soma final num multiplo de 10
-    int_digito_ver = (10 - (calc_soma(str_cad) % 10))
-    if int_digito_ver != 10:
-        return str(int_digito_ver % 10)
+def digito_verificacao(cc_str):
+    """ Calculates the verification digit for the given credit card number
+    Params: (string) 'CC Number' cc_str
+    Return: (string) 'Verification digit'"""
+    
+    # Complements the sum with the digit that will make the resulting sum a
+    # multiple of 10
+    verification_digit = (10 - (calc_soma(cc_str) % 10))
+    if verification_digit != 10:
+        return str(verification_digit % 10)
     return '0'
 
+
+
 ##
-## Funcoes principais
+## Main functions
 ##
 
 from random import random
 
-def verifica_cc(int_num_cc):
-    """ Verifica se num_cc e um numero valido de cartao de credito
-    Recebe: (Int) 'Numero de CC' int_num_cc
-    Devolve: (Tuplo) 'Categoria e Rede Emissora' ou (String) 'Invalido' """
-    str_num_cc = str(int_num_cc)
-    if luhn_verifica(str_num_cc) and valida_iin(str_num_cc) != '':
-        return (categoria(str_num_cc), valida_iin(str_num_cc))
+def verifica_cc(cc_num):
+    """ Checks if cc_num is a valid credit card number
+    Params: (int) 'CC Number' cc_num
+    Return: (tuple) 'Category and Issuer', if valid,
+            (string) 'Invalido' otherwise"""
+    
+    cc_str = str(cc_num)
+    if luhn_verifica(cc_str) and valida_iin(cc_str) != '':
+        return (categoria(cc_str), valida_iin(cc_str))
     return 'cartao invalido'
 
-def gera_num_cc(str_abrev_cc):
-    """ Gera um numero de cc aleatoriamente com base na abreviatura dada
-    Recebe: (String) 'Abreviatura da Rede' str_abrev_cc
-    Devolve: (Int) 'Numero de CC' """
-    t_info_cc = ()
+def gera_num_cc(issuer_abbrev):
+    """ Generates a random credit card number based on the given abbreviation
+    Params: (string) 'Issuer abbreviation' issuer_abbrev
+    Return: (int) 'CC Number'"""
     
-    # Escolhera, se encontrar, o tuplo com a rede correspondente a abreviatura
-    for i in range(len(T_INFO_CARTOES)):
-        if str_abrev_cc == T_INFO_CARTOES[i][INT_ABREVIATURA]:
-            t_info_cc = T_INFO_CARTOES[i]
-    if len(t_info_cc) == 0:
+    cc_issuer = ()
+    
+    # Will choose the tuple, if found, with the issuer corresponding the given
+    # abbreviation
+    for i in range(len(CC_INFO)):
+        if issuer_abbrev == CC_INFO[i][IDX_ABBREVIATION]:
+            cc_issuer = CC_INFO[i]
+    if len(cc_issuer) == 0:
         return 'Abreviatura invalida'
     
-    # Escolher um dos prefixos aleatoriamente com base nos que existem, se forem
-    # mais que um
-    int_len_iin = len(t_info_cc[INT_DIGITOS_IIN])
-    str_iin_cc = t_info_cc[INT_DIGITOS_IIN][int(int_len_iin * random())]
+    # Choose one of the prefixes randomly based on the ones available, if there
+    # are more than one
+    iin_len = len(cc_issuer[IDX_IIN_DIGITS])
+    iin_digits = cc_issuer[IDX_IIN_DIGITS][int(iin_len * random())]
     
     # O mesmo com os comprimentos
-    int_len_comps = len(t_info_cc[INT_COMPRIMENTO])
-    int_comp_cc = t_info_cc[INT_COMPRIMENTO][int(int_len_comps * random())]
+    lengths_len = len(cc_issuer[IDX_LENGTH])
+    cc_len = cc_issuer[IDX_LENGTH][int(lengths_len * random())]
     
-    str_num_cc = str(str_iin_cc)
-    int_comp_cc = int_comp_cc - (len(str_iin_cc) + 1)
+    cc_num = str(iin_digits)
+    cc_len = cc_len - (len(iin_digits) + 1)
     
-    for n in range(int_comp_cc):
-        str_num_cc = str_num_cc + str(int(10 * random()))
+    for n in range(cc_len):
+        cc_num = cc_num + str(int(10 * random()))
     
-    return int(str_num_cc + digito_verificacao(str_num_cc))
+    return int(cc_num + digito_verificacao(cc_num))
