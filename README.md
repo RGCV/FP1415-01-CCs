@@ -1,4 +1,4 @@
-# Números de Cartões de Crédito
+# Números de Cartões de Crédito [EN](README.en.md)
 ### 1º Projecto de FP - 14'15
 
 ---
@@ -21,6 +21,7 @@ crédito e (2) gera números correctos para cartões de crédito.
 
 ---
 
-Mais informação no [Enunciado do Projecto][1].
+Mais informação no enunciado do projecto: [PT][PT] - [EN][EN].
 
-[1]: Enunciado_FP1415-01.pdf "1º Projecto de FP - 2014'15"
+[PT]: statement_pt.pdf "Enunciado do Projecto"
+[EN]: statement_en.pdf "Problem Statement"
