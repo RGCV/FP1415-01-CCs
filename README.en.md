@@ -20,6 +20,8 @@ number, and (2) generate correct credit card numbers.
 
 ---
 
-More information in the Problem's Statement: [PT][1].
+More information in the Problem's Statement: [PT][PT] - [EN][EN].
 
-[1]: statement_pt.pdf "Enunciado do Projecto"
+[PT]: statement_pt.pdf "Enunciado do Projecto"
+[EN]: statement_en.pdf "Problem Statement"
+
