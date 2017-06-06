@@ -204,7 +204,7 @@ def check_cc(cc_num):
     cc_str = str(cc_num)
     if luhn_verify(cc_str) and valida_iin(cc_str) != '':
         return (category(cc_str), valida_iin(cc_str))
-    return 'cartao invalido'
+    return 'invalid card'
 
 def generate_cc_num(issuer_abbrev):
     """ Generates a random credit card number based on the given abbreviation
@@ -219,14 +219,14 @@ def generate_cc_num(issuer_abbrev):
         if issuer_abbrev == CC_INFO[i][IDX_ABBREVIATION]:
             cc_issuer = CC_INFO[i]
     if len(cc_issuer) == 0:
-        return 'Abreviatura invalida'
+        return 'invalid abbreviation'
     
     # Choose one of the prefixes randomly based on the ones available, if there
     # are more than one
     iin_len = len(cc_issuer[IDX_IIN_DIGITS])
     iin_digits = cc_issuer[IDX_IIN_DIGITS][int(iin_len * random())]
     
-    # O mesmo com os comprimentos
+    # Same with sizes
     lengths_len = len(cc_issuer[IDX_LENGTH])
     cc_len = cc_issuer[IDX_LENGTH][int(lengths_len * random())]
     
