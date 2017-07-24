@@ -21,7 +21,7 @@ crédito e (2) gera números correctos para cartões de crédito.
 
 ---
 
-Mais informação no enunciado do projecto: [PT][PT] - [EN][EN].
+Mais informação no enunciado do projecto: [PT][1] - [EN][2].
 
-[PT]: statement_pt.pdf "Enunciado do Projecto"
-[EN]: statement_en.pdf "Problem Statement"
+[1]: statement.pt_PT.pdf "Enunciado do Projecto"
+[2]: statement.en_US.pdf "Problem Statement"
