@@ -1,27 +1,27 @@
-# Números de Cartões de Crédito [EN](README.en.md)
-### 1º Projecto de FP - 14'15
+# Credit Card Numbers [PT](README.pt_PT.md)
+### 1st FP Project - 14'15
 
 ---
 
-### Descrição do Problema
+### Problem Description
 
-Os números de cartões de crédito partilham um esquema de numeração comum de 
-acordo com a norma ISO / IEC 7812. O esquema mais utilizado para os números de 
-cartões de crédito tem entre 12 e 19 dígitos com uma dada constituição.
+Credit card numbers share a common numbering scheme according to ISO / IEC 7812.
+The most used scheme for credit card numbers ranges from 12 to 19 digits with a
+certain form.
 
-Resumidamente, o primeiro dígito de um cartão de crédito representa a 
-categoria da entidade que emitiu o cartão, os seis dígitos iniciais (a.k.a. 
-IIN, "Issuer Identification Number") identifica a instituição, sendo o resto 
-do número atribuído pelo emissor. A maioria dos números de cartões de crédito 
-é validada utilizando o algoritmo de Luhn.
+Briefly, a credit card number's first digit represents the category of the
+issuing entity, the first six digits (a.k.a. IIN, Issuer Identification Number)
+identify the institution, leaving the rest to the issuer's criteria. Most credit
+card numbers are validated using Luhn's algorithm.
 
-Pretende-se com este trabalho a escrita de um programa em `Python` que efectua 
-dois tipos de operações: (1) verifica a correcção do número de um cartão de 
-crédito e (2) gera números correctos para cartões de crédito.
+With this project, it is inteded that a program is written in `Python` that
+performs two kinds of operations: (1) verify the correction of a credit card
+number, and (2) generate correct credit card numbers.
 
 ---
 
-Mais informação no enunciado do projecto: [PT][PT] - [EN][EN].
+More information in the Problem's Statement: [PT][PT] - [EN][EN].
 
 [PT]: statement_pt.pdf "Enunciado do Projecto"
 [EN]: statement_en.pdf "Problem Statement"
+
